@@ -41,3 +41,40 @@ What I actually learned:
   — same average, totally different match shapes. The mean can't tell
   them apart. That gap is exactly what Poisson is supposed to fix next
   session.
+
+## Session 3 — Poisson model: from strengths to match probabilities
+
+Built the model that turns team strengths into actual match
+predictions. The chain: each team's attack/defence strength →
+expected goals for a specific matchup → Poisson spreads that into
+scoreline probabilities (P of scoring exactly 0,1,2,3...) → combine
+home and away distributions into home-win / draw / away-win.
+
+Tested on Birmingham (1st) vs Burton (~20th):
+- Expected goals: 2.03 vs 0.33
+- Burton's chance of scoring exactly 0: 72%
+- Result: Home 77.9% / Draw 17.0% / Away 5.1% (sums to 1.0 — checks out)
+
+What tripped me up / what I learned:
+- I predicted 46% home win, model said 78%. The gap was the lesson:
+  I anchored on "strong vs average," but this was "best vs worst" —
+  the two extremes multiply. My football intuition reasons about one
+  team's quality; the model reasons about the GAP between two teams.
+- Poisson is what finally closed the average-vs-spread problem I
+  spotted in session 2: "expect 2.03 goals" became a full distribution
+  over actual scorelines.
+
+The big realisation for next time — IN-SAMPLE vs OUT-OF-SAMPLE:
+- Right now I build strengths from a season AND predict matches from
+  that SAME season. The model has already seen the answers. That's
+  not prediction, it's describing data I already have. A model always
+  looks good on the data it was built from.
+- Real prediction = build strengths from one period, test on a LATER
+  period the model never saw. Train on early, test on later, never let
+  it peek. That's the backtest, and it's the only honest way to answer
+  "do I have an edge."
+- Also noted: team strength isn't fixed (form, transfers, managers
+  change). A season-long average is a crude proxy. Real models weight
+  recent games more. Refinement for later.
+
+Next session: the train/test split — the start of honest backtesting.
