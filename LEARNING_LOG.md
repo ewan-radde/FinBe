@@ -78,3 +78,51 @@ The big realisation for next time — IN-SAMPLE vs OUT-OF-SAMPLE:
   recent games more. Refinement for later.
 
 Next session: the train/test split — the start of honest backtesting.
+
+## Session 4 — First honest backtest (train/test split)
+
+The big gear-change: stopped letting the model grade its own homework.
+
+Set-up:
+- Parsed dates, sorted the season chronologically.
+- Split 70/30 BY DATE: trained on Aug 2024–Feb 2025 (386 matches),
+  tested on Feb–May 2025 (166 matches the model never saw).
+- Built strengths from TRAIN ONLY, then predicted the test matches.
+- Note: League One has 24 teams = 552 matches (46 per team), not 380.
+  Worth remembering — it's why every team still had enough games after
+  the split (no missing strengths).
+
+What happened to Birmingham vs Burton:
+- Full-season model (session 3): 0.779 / 0.170 / 0.051
+- Train-only model: 0.712 / 0.220 / 0.068
+- The home-win prob DROPPED ~7 points. Why: seeing only games up to
+  February = fewer games = less extreme, less confident estimates. The
+  model softening is it being honest about knowing less. Good.
+
+The result:
+- Model accuracy: 51.2% (85/166)
+- Baseline (always pick Home): 40.4%
+- So the model BEAT the naive baseline out-of-sample by ~11 points.
+  The team-strength signal is real and survives on unseen data. This
+  was the thing I worried wouldn't hold up — it did.
+
+The big flaw (more instructive than the win):
+- Model predicted 104 H, 61 A, but only 1 DRAW — out of 166.
+- Yet 39 of those matches (24%) WERE draws. The model is structurally
+  blind to a quarter of all outcomes.
+- KEY DISTINCTION: this is a DECISION-RULE flaw, not a model flaw. The
+  Poisson model does assign draws real probability (Birmingham-Burton
+  got 22%). It's "pick the single highest-probability outcome" that
+  discards them, because a draw is almost never the single likeliest
+  result even when it's likely in absolute terms.
+
+The deeper lesson — ACCURACY IS THE WRONG METRIC:
+- A bookmaker doesn't care if I "called" the result. They care whether
+  my probabilities are CALIBRATED: when I say 22% draw, do draws
+  actually happen ~22% of the time?
+- A model can have mediocre accuracy but great calibration and still be
+  profitable. Great accuracy + bad calibration = useless for betting.
+- So 51% is just a sanity check that the model isn't broken. It is NOT
+  the number that tells me whether I have an edge.
+
+Next session: calibration — the metric that actually matters for betting.
