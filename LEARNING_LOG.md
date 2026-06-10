@@ -126,3 +126,50 @@ The deeper lesson — ACCURACY IS THE WRONG METRIC:
   the number that tells me whether I have an edge.
 
 Next session: calibration — the metric that actually matters for betting.
+
+## Session 5 — Calibration (the metric that actually matters for betting)
+
+Moved past accuracy to the real question: when the model says 30%,
+does it happen ~30% of the time?
+
+Method:
+- Took the 166 out-of-sample home-win predictions from session 4.
+- Bucketed them by predicted probability (0-0.2, 0.2-0.3, ... 0.7-1.0).
+- In each bucket, compared AVG PREDICTED probability against the
+  ACTUAL home-win rate. Close together = well-calibrated.
+- Plotted it as a calibration curve (predicted vs actual, with the
+  diagonal y=x as "perfect"). Point size = number of matches.
+
+What the curve showed:
+- Where it matters most (0.4-0.7, holding the most matches: n=37,30,19)
+  the model is WELL-CALIBRATED. Predicted 0.45 / actual 0.41, predicted
+  0.54 / actual 0.53, predicted 0.64 / actual 0.63. When it says "55%
+  home win," home teams win ~53%. The probabilities are trustworthy
+  where most predictions live. Real, non-obvious, encouraging.
+
+Reading the wobble — signal vs noise (the actual skill):
+- Extreme buckets looked off but are TOO THIN to judge. The 0.7-1.0
+  bucket = 6 matches = "0.667 actual" is just 4 wins out of 6. Flip one
+  match and it's 0.83. Meaningless. Cross it out.
+- The 0-0.2 bucket (n=15) also too thin to trust.
+- The ONE real finding: 0.2-0.3 bucket has 35 matches (a real sample)
+  and predicted 0.25 vs actual 0.11. Genuinely OVERCONFIDENT when it
+  thinks the home team is a moderate underdog — it's not pessimistic
+  enough about them. Worth investigating, not panicking.
+
+The meta-lesson (biggest takeaway):
+- Half my buckets are too small to conclude anything. 166 matches isn't
+  enough. The single biggest improvement to this whole project is NOT a
+  cleverer model — it's MORE DATA. Multiple seasons, multiple leagues.
+  That fills every bucket and turns "hint of overconfidence" into
+  "confirmed and measurable."
+- Filed: next major leap = data volume, not model complexity.
+
+Why this connects to the real goal:
+- A bookmaker's odds imply a probability. To find value I need my
+  probability to be both DIFFERENT from theirs AND more accurate.
+  Calibration is what tells me whether my probabilities can be trusted
+  to do that. It's the bridge to comparing against the market.
+
+Next session: either (a) load multiple seasons to fix the data problem,
+or (b) start the odds-side work — overround and margin removal (Buchdahl).
