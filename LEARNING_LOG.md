@@ -173,3 +173,57 @@ Why this connects to the real goal:
 
 Next session: either (a) load multiple seasons to fix the data problem,
 or (b) start the odds-side work — overround and margin removal (Buchdahl).
+
+## Session 6 — Multi-season data: the noise fix that revealed a real flaw
+
+Goal: fix the "166 matches is too few" problem from session 5 by
+stacking multiple seasons. Stacked 6 complete League One seasons
+(20-21 through 25-26) = 3,312 matches, 8.6x the original 386.
+
+The promotion/relegation reality:
+- NOT 24 teams across 6 seasons — 49 distinct teams. Only Lincoln and
+  Burton appear in all 6 (the League One lifers). A long tail appear
+  just once (Birmingham, Wrexham, Sunderland) — passing through on the
+  way up or down. The data encodes each club's trajectory.
+- This is WHY you can't just flat-average a team across all seasons:
+  (1) unequal samples (Lincoln has 6 seasons, Birmingham 1), and
+  (2) strength isn't stable across years — a 2020 team tells you little
+  about the 2025 version. Old data is stale, not just thin. COVID
+  season (20-21) especially distorted: empty stadiums reduced home
+  advantage that year.
+
+The method I chose (Option 1 — per-season, then pool):
+- Run the full train/test pipeline INDEPENDENTLY inside each season
+  (train on that season's early games, predict its late games), then
+  POOL all 6 seasons' out-of-sample predictions = 996 predictions.
+- Why this one: strengths stay clean (only ever from the same season,
+  no staleness, no blending), but I still get 6x the calibration data.
+  It doesn't make any single prediction smarter — it gives me a
+  trustworthy calibration baseline. That's exactly what session 5
+  said I needed. (Recency-weighting is the NEXT step, not this one —
+  it needs this baseline to be tuned against.)
+
+The payoff — two findings:
+1. The session-5 "overconfidence" panic (0.2-0.3 bucket, predicted
+   0.25 vs actual 0.11) was NOISE. With 159 matches instead of 35 it's
+   now 0.250 vs 0.226 — nearly perfect. Lesson confirmed: never act on
+   thin buckets. I was right to flag it AND right not to panic.
+2. A REAL pattern emerged that 166 matches had buried: the model is
+   systematically OVERCONFIDENT AT THE EXTREMES. When it predicts a
+   high home-win prob, home wins LESS often (0.646 -> 0.551, n=127);
+   when it predicts low, home wins MORE often (0.146 -> 0.239, n=113).
+   The probabilities are too SPREAD OUT; the truth is compressed toward
+   the middle. On the curve it's an S-shape bowing away from the
+   diagonal at both ends.
+
+The meta-lesson:
+- More data didn't just firm up numbers — it REVEALED a real,
+  systematic, fixable flaw I literally could not see at 166 matches.
+  This vindicates the whole session. Signal was always there; I needed
+  the sample size to see it past the noise.
+- Mechanically the flaw makes sense: raw goal-average strengths don't
+  account for small samples producing extreme-looking teams who then
+  regress to the mean. The model takes extremes at face value.
+
+Next session: the fix for overconfidence — shrinkage / regression to
+the mean (pulling extreme strength estimates back toward average).
