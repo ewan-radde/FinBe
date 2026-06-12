@@ -227,3 +227,62 @@ The meta-lesson:
 
 Next session: the fix for overconfidence — shrinkage / regression to
 the mean (pulling extreme strength estimates back toward average).
+
+## Session 7 — Shrinkage: fixing the overconfidence
+
+Goal: fix the systematic overconfidence found in session 6 (model's
+probabilities too spread out, truth compressed toward the middle).
+
+The technique — shrinkage (regression to the mean):
+- Pull every team's strength estimate PARTWAY back toward the league
+  average, weighted by how many games it's based on.
+- Formula: shrunk = (n*team_avg + k*league_avg) / (n + k)
+  where n = games played, k = "phantom league-average games" added to
+  every team. Few games (small n) -> lean toward league average (don't
+  trust thin data). Many games -> lean toward the team's real average.
+  k controls how hard you shrink. k=0 = no shrinkage (old model).
+- WHY it's the right fix: raw goal-averages take small samples at face
+  value — a team that scored a lot in a few games gets tagged "strong"
+  but some of that was luck, not skill. Shrinkage trims the luck.
+- It's the discrete cousin of Bayesian estimation: league average is
+  the "prior," each team's data updates it. Same idea used in baseball
+  sabermetrics and a lot of finance for noisy estimates.
+
+The result (k=5, ~16 training games per team):
+- Reproduced session 6 exactly at k=0 first (so any change = shrinkage,
+  not a code artifact). Good habit: isolate the variable.
+- High-end overconfidence gap COLLAPSED:
+  - 0.6-0.7 bucket: gap went from +0.095 (predicted 0.646 vs actual
+    0.551) to +0.014 (0.639 vs 0.625). Nearly perfect.
+  - 0.7-1.0 bucket: from +0.050 to -0.028.
+- The curve pulled in toward the diagonal, most at the high end where
+  the worst flaw was.
+- Honest caveat: the LOW end (0.0-0.2) barely improved — still ~7-point
+  gap. The underdog/away side is still a bit overconfident. Less data
+  and more noise on away form. Noted, not fixed.
+- Bucket counts shifted: extreme buckets shrank (top went 66->22),
+  middle swelled. Correct — the model stopped making over-extreme
+  claims. That's the compression working.
+
+The DISCIPLINE lesson (most important):
+- Tempting to try lots of k values and pick the prettiest. That's
+  OVERFITTING TO THE TEST SET — using test data to make a modelling
+  decision silently turns it into training data and inflates how good
+  the model looks.
+- To tune k honestly I'd need a THIRD slice: a validation set, separate
+  from train and test. Try k values on validation, check the winner
+  ONCE on test. I don't have that split, so the honest move is to pick
+  a defensible k from reasoning and NOT tune against test.
+- k=5 chosen from problem structure (~1/3 of a team's game count —
+  shrinks noise without erasing real differences), NOT from peeking.
+  "Why k=5?" -> "roughly a third of game count, shrinks noise without
+  erasing signal, deliberately not tuned against test." Strong answer.
+  "I tried 20 values and 5 won" -> weak answer even if it sounds
+  thorough.
+
+Future improvement: proper k tuning with a train/validation/test split.
+Also still open: the underdog-side overconfidence, and recency-weighting
+from session 6.
+
+Next: with calibrated probabilities, start the odds-side work — overround
+and margin removal (Buchdahl), to compare my probabilities vs the market.
