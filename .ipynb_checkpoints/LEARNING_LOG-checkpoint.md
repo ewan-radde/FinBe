@@ -286,3 +286,53 @@ from session 6.
 
 Next: with calibrated probabilities, start the odds-side work — overround
 and margin removal (Buchdahl), to compare my probabilities vs the market.
+
+## Session 8 — Odds-side begins: implied probabilities and the overround
+
+First contact with the market side. Sessions 1-7 built MY probability
+estimate; this extracts the MARKET's, from the bookmaker odds in the CSV.
+
+The core conversions:
+- Decimal odds -> implied probability = 1 / odds. (Odds of 2.00 imply
+  a 50% chance.)
+- The OVERROUND = sum of the three implied probabilities (home + draw +
+  away). For real probabilities this should be 1.0 (100%). It's always
+  MORE — the excess is the bookmaker's margin / vig / juice.
+- A sum over 100% can't be a real probability set — it's the margin
+  inflating the raw inverses. So raw 1/odds is NOT the market's true
+  probability; it's inflated and has to be de-margined.
+
+Which odds to use:
+- CSV has ~20 bookmakers. Pinnacle is the sharpest (Buchdahl's whole
+  conclusion), columns PSH/PSD/PSA, and PSCH/PSCD/PSCA for CLOSING.
+- Use CLOSING (PSC). Why: the closing line is the final price before
+  kickoff — most time to absorb all betting action, sharp money, late
+  info (injuries, lineups). It's the single sharpest probability the
+  market produces. "Beating the closing line" = beating PSC.
+- Also present: Avg/Max across all books. Those matter LATER for the
+  value hunt (compare best available price vs sharp true price). Not
+  needed for establishing true probability.
+
+The result (24-25 season, 165 matches with Pinnacle closing odds):
+- Average overround: 1.0418 = a 4.18% margin.
+- DISCREPANCY worth noting: Buchdahl found Pinnacle ~2.7%. Mine is
+  higher. Why this is REAL, not an error: his sample was worldwide top
+  divisions; League One is lower and less liquid. Lower-tier football
+  carries fatter margins — less sharp money to tighten the line, more
+  uncertainty. The wisdom-of-the-crowd effect is weaker where the crowd
+  is smaller. Still far tighter than UK books (6-8% here).
+- Margin spread is tight (1.037 to 1.060) — Pinnacle applies a fairly
+  consistent margin across matches.
+
+Where this leaves me:
+- I now have the market's RAW implied probabilities (still inflated by
+  the margin) AND my model's calibrated probabilities (sessions 1-7).
+- They are NOT comparable yet — the market numbers are inflated. Must
+  strip the margin first. And the margin is NOT spread evenly: the
+  favourite-longshot bias inflates longshots more than favourites
+  (Buchdahl). Naive fix (divide each by overround) ignores that.
+
+Next session: strip the margin properly — the three Buchdahl methods
+(equal / proportional-to-odds / and the bias-aware ones) — to get the
+market's TRUE implied probabilities. Then the two estimates are finally
+comparable = the edge hunt.
