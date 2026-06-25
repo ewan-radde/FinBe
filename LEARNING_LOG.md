@@ -336,3 +336,59 @@ Next session: strip the margin properly — the three Buchdahl methods
 (equal / proportional-to-odds / and the bias-aware ones) — to get the
 market's TRUE implied probabilities. Then the two estimates are finally
 comparable = the edge hunt.
+
+## Session 9 — Stripping the margin: market "true" probabilities
+
+Goal: turn the market's RAW implied probs (inflated by the ~4% overround)
+into genuine probabilities summing to 1.0, so they're finally comparable
+to my model's.
+
+The 165 -> 552 mystery (and why I checked instead of assuming):
+- Same extraction as session 8 gave 552 matches this time, not 165. An
+  unexplained jump in row count is exactly what silently corrupts
+  analysis, so I verified before building on it.
+- Checked: 552 rows, 0 missing results, 0 missing Pinnacle odds, full
+  Aug 2024->May 2025 range. Explanation: when I first downloaded 24-25
+  the season was still in progress (~165 played), so only those had
+  closing odds. The file has since refreshed to the complete season.
+  Benign — more data, cleanly explained.
+- Implication filed: other season files may also have been partial when
+  downloaded. Counts could shift if I re-run multi-season calibration.
+
+Two margin-stripping methods:
+- METHOD 1 (equal): divide each raw prob by the overround. Trivially
+  sums to 1, but spreads the margin EVENLY — ignores the bias.
+- METHOD 2 (proportional-to-odds, Buchdahl's original):
+  fair_odds = n*O / (n - M*O), with n=3, M=margin, O=bookmaker odds.
+  The M*O term grows with the odds, so LONGSHOTS get more margin
+  stripped. Then prob = 1/fair_odds.
+- Both confirmed to sum to ~1.0.
+
+The favourite-longshot bias made visible (row 1, a lopsided match):
+- Favourite (home): equal 0.642 vs proportional 0.656 (proportional
+  gives the favourite MORE).
+- Longshot (away): equal 0.155 vs proportional 0.147 (proportional
+  gives the longshot LESS).
+- The two methods nearly agree on balanced matches and diverge most
+  when there's a clear favourite + clear longshot. That divergence IS
+  the bias. Magnitude small (~1 point) but systematic and in Buchdahl's
+  predicted direction — which is what a real bias looks like vs noise.
+
+Which method I carry forward:
+- Can't PROVE proportional beats equal on 552 matches (Buchdahl needed
+  130k+ games to separate them). But proportional is theoretically
+  sounder — it accounts for a bias that demonstrably exists — so I
+  carry the proportional probs forward as "market truth." Using the
+  better-reasoned method even when I can't prove it on my sample is the
+  defensible call. (Same discipline as choosing k=5 from reasoning.)
+
+Where this leaves me:
+- I now have, for all 552 matches: the market's best estimate of true
+  probability (Pinnacle closing, margin stripped) — per Buchdahl's
+  r=0.995, about as close to "truth" as exists a priori. AND my model's
+  probability for the same matches.
+- For the first time the two are directly comparable: both sum to 1.0,
+  both estimate the same thing.
+
+Next session: the edge hunt. Put model probs vs market probs side by
+side — where does my model disagree, and when it does, who's right?
