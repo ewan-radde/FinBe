@@ -392,3 +392,64 @@ Where this leaves me:
 
 Next session: the edge hunt. Put model probs vs market probs side by
 side — where does my model disagree, and when it does, who's right?
+
+## Session 10 — The edge hunt: model vs the closing line
+
+The session everything was building toward. Put MY model's probabilities
+against the MARKET's (Pinnacle closing, margin-stripped) and tested,
+honestly, whether the model beats the sharpest line in the world.
+
+Methodology (and the traps avoided):
+- Compared on the TEST set only (~166 matches the model never trained
+  on). Comparing on training matches = the model has peeked = fake edge.
+- "Edge" = model prob / market true prob. >1.0 = model thinks the
+  outcome is underpriced (value).
+- CRITICAL: a probability gap is NOT proof I'm right — it just means I
+  disagree. The judge is ACTUAL RESULTS: simulate betting the value
+  bets at real Pinnacle odds, settle against what happened, look at P&L.
+  The market might be right and me wrong.
+
+The diagnostic BEFORE betting (reading the warning signs):
+- Edges were too big — model claimed some outcomes 100%+ more likely
+  than Pinnacle (max edge ~2.26). When a goal-average model violently
+  disagrees with a market validated at r=0.995, the smart bet is that
+  MY MODEL is wrong, not Pinnacle. Big edges = my errors, not value.
+- Asymmetry: model saw value on AWAY far more than home (94 vs 81), and
+  mean away edge (1.091) > home (1.051). This traces to the home/away
+  calibration weakness from session 7 — the model under-rates home
+  advantage, which mechanically makes away outcomes look like value.
+  So the model "sees value" exactly where it's least calibrated. A
+  warning, not an opportunity.
+
+The result — betting every value bet, by threshold:
+- threshold 1.00: 241 bets, -16.0% ROI
+- threshold 1.05: 193 bets, -12.4% ROI
+- threshold 1.10: 152 bets, -15.3% ROI
+- threshold 1.20: 103 bets,  -3.9% ROI
+- LOSES AT EVERY THRESHOLD. The model does not beat the closing line.
+
+Reading it honestly (the discipline):
+- This is EXACTLY what Buchdahl's whole document predicts: a
+  goal-average Poisson model on one season does not out-predict
+  Pinnacle's close. The negative result is CORRECT, not failure.
+- The -3.9% at threshold 1.20 is NOT a working filter. Only 103 bets =
+  deep in small-sample noise; statistically indistinguishable from -16%.
+  Resisting "so 1.20 works" is the exact self-deception this project
+  trains against.
+- And even -3.9% is before costs: betting at Pinnacle's odds means
+  paying the ~4% overround. Not close to break-even.
+
+THE CONCLUSION:
+- My model does not contain exploitable edge against Pinnacle's closing
+  line. Stated plainly, with numbers, accounting for sample size and
+  costs.
+- WHY THIS IS THE STRONG OUTCOME, not the disappointing one: "I built
+  the full pipeline and honestly measured that it loses ~12% to the
+  closing line, and here's why that's expected" demonstrates I won't
+  fool myself with an overfit backtest. That's the rarest, most
+  valuable trait for handling capital — and it's on the record, in a
+  public repo, with the numbers.
+
+Next: "what would it actually take to beat the line?" — turning a
+finished project into a roadmap (better features beyond goal averages,
+more leagues, recency weighting, proper validation split, etc.).
